@@ -1,0 +1,27 @@
+[package]
+name = "op-media"
+version = "0.1.0"
+edition = "2021"
+description = "Privacy-first photo/video ingestion with metadata scrubbing, content hashing, and signed hash-chained records"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/danpennic-sys/op-media"
+keywords = ["privacy", "media", "exif", "hash-chain", "ingest"]
+categories = ["multimedia", "cryptography"]
+readme = "README.md"
+
+[features]
+default = []
+# Enable pose / keypoint inference output (requires platform Inference impl)
+pose = []
+
+[dependencies]
+sha2 = "0.10"
+thiserror = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[package.metadata.docs.rs]
+all-features = true
