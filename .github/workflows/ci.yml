@@ -15,22 +15,24 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: -D warnings
 
 jobs:
+  # Primary job pinned to a specific toolchain so new upstream lints
+  # cannot break main without an intentional bump.
   check:
-    name: Check
+    name: Check (1.85)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust 1.85
+        uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: "1.85.0"
           components: clippy, rustfmt
 
-      - name: Cache cargo registry and build
+      - name: Cache cargo
         uses: Swatinem/rust-cache@v2
 
       - name: Format
@@ -39,8 +41,56 @@ jobs:
       - name: Clippy
         run: cargo clippy --all-targets --all-features -- -D warnings
 
-      - name: Test
+      - name: Test (default features)
+        run: cargo test
+
+      - name: Test (--all-features)
         run: cargo test --all-features
+
+      - name: Test (--no-default-features)
+        run: cargo test --no-default-features
 
       - name: Example
         run: cargo build --example basic
+
+  # Floating stable is advisory only – failures here do not block merge.
+  stable:
+    name: Stable (advisory)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Clippy on stable
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      - name: Test on stable
+        run: cargo test --all-features
+
+  audit:
+    name: Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+
+      - name: cargo audit
+        run: cargo audit
