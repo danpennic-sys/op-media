@@ -51,7 +51,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Tiny synthetic JPEG containing an APP1 segment that must be stripped
     let mut jpeg = vec![0xFF, 0xD8, 0xFF, 0xE1, 0x00, 0x08];
     jpeg.extend_from_slice(b"SECRET");
-    jpeg.extend_from_slice(&[0xFF, 0xDA, 0x00, 0x08, 1, 1, 0, 0, 0x3F, 0, 0xAA, 0xBB, 0xFF, 0xD9]);
+    jpeg.extend_from_slice(&[
+        0xFF, 0xDA, 0x00, 0x08, 1, 1, 0, 0, 0x3F, 0, 0xAA, 0xBB, 0xFF, 0xD9,
+    ]);
 
     let cfg = Config {
         enabled: true,
