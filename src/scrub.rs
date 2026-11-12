@@ -97,7 +97,9 @@ mod tests {
         // SOI, APP1("SECRET"), SOS header, 2 entropy bytes, EOI, trailer
         let mut v = vec![0xFF, 0xD8, 0xFF, 0xE1, 0x00, 0x08];
         v.extend_from_slice(b"SECRET");
-        v.extend_from_slice(&[0xFF, 0xDA, 0x00, 0x08, 1, 1, 0, 0, 0x3F, 0, 0xAA, 0xBB, 0xFF, 0xD9]);
+        v.extend_from_slice(&[
+            0xFF, 0xDA, 0x00, 0x08, 1, 1, 0, 0, 0x3F, 0, 0xAA, 0xBB, 0xFF, 0xD9,
+        ]);
         v.extend_from_slice(b"TRAILER");
         v
     }
@@ -105,7 +107,9 @@ mod tests {
     #[test]
     fn strips_app1_and_trailer() {
         let scrubber = JpegScrubber;
-        let clean = scrubber.scrub(MediaKind::Photo, &tiny_jpeg_with_secret()).unwrap();
+        let clean = scrubber
+            .scrub(MediaKind::Photo, &tiny_jpeg_with_secret())
+            .unwrap();
         assert!(!clean.windows(6).any(|w| w == b"SECRET"));
         assert!(!clean.windows(7).any(|w| w == b"TRAILER"));
         assert_eq!(&clean[..2], &[0xFF, 0xD8]);
